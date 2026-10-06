@@ -2,6 +2,10 @@
 
 A simple, thoughtfully designed task manager for keeping everyday work in order. Add tasks, track what is still in progress, and check off completed work from a clean dashboard.
 
+## Live demo
+
+[Try Task Manager](https://task-management-react-azure.vercel.app/)
+
 ## Features
 
 - Create and delete tasks
