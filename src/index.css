@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@layer components {
+    .btn-filter {
+        @apply bg-indigo-900 m-2 px-4 py-1 rounded-md
+    }
+
+    .btn-submit {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-950/40 transition hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950
+    }
+
+    .input-task {
+        @apply min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900/80 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
+    }
+}

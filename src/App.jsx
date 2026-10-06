@@ -6,11 +6,13 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ProtectedRoute from './components/Protected_Route'
 import Dashboard from './pages/Dashboard'
+import { ServicesProvider } from './context/Services'
 
 const App = () => {
   return (
     <AuthProvider>
       <Router>
+        <ServicesProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
@@ -27,6 +29,7 @@ const App = () => {
           />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        </ServicesProvider>
       </Router>
     </AuthProvider>
   )
