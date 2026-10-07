@@ -10,7 +10,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      setUser({ token });
+      try {
+        const savedUser = JSON.parse(localStorage.getItem("user") || "null");
+        setUser(savedUser?.token === token ? savedUser : { token });
+      } catch {
+        setUser({ token });
+      }
     }
     setLoading(false);
   }, [])
@@ -18,11 +23,13 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("token", userData.token);
+    localStorage.setItem("user", JSON.stringify(userData));
   }
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }
 
   return (

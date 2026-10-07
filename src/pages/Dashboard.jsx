@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
 import TaskFilter from '../components/TaskFilter';
@@ -10,8 +10,23 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const { tasks } = useServices();
   const navigate = useNavigate();
+  const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const userMenuRef = React.useRef(null);
   const completedCount = tasks.filter(task => task.completed).length;
   const activeCount = tasks.length - completedCount;
+
+  React.useEffect(() => {
+    if (!isUserMenuOpen) return;
+
+    const closeOnOutsideClick = (event) => {
+      if (!userMenuRef.current?.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    return () => document.removeEventListener('pointerdown', closeOnOutsideClick);
+  }, [isUserMenuOpen]);
 
   const handleLogout = () => {
     logout();
@@ -27,28 +42,54 @@ const Dashboard = () => {
       <div className="absolute w-96 h-96 bg-purple-600 rounded-full bottom-0 left-0 blur-[150px] opacity-10 pointer-events-none"></div>
 
       {/* NAVBAR: Kaca Transparan (Glassmorphism) */}
-      <nav className="relative z-10 border-b border-white/10 bg-white/[0.02] backdrop-blur-md">
+      <nav className="relative z-30 border-b border-white/10 bg-white/[0.02] backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
             {/* Logo / Brand */}
             <div className="flex-shrink-0">
-              <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                MyDashboard
-              </span>
+              <Link to="/dashboard" className="inline-block transition hover:opacity-80">
+                <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                  MyDashboard
+                </span>
+              </Link>
             </div>
 
             {/* Menu Sisi Kanan: Informasi User & Tombol Logout */}
-            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-900/60 p-1.5 pl-2 sm:gap-3 sm:pl-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white shadow-inner shadow-white/20">
-                {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
-              </div>
-              <div className="min-w-0 pr-1">
-                <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500">Akun</p>
-                <p className="max-w-28 truncate text-sm font-semibold text-slate-100 sm:max-w-40">
-                  {user?.name || user?.email || 'Pengguna'}
-                </p>
-              </div>
+            <div ref={userMenuRef} className="relative flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-900/60 p-1.5 pl-2 sm:gap-3 sm:pl-3">
+              <button
+                type="button"
+                onClick={() => setIsUserMenuOpen(open => !open)}
+                aria-expanded={isUserMenuOpen}
+                aria-haspopup="true"
+                className="flex min-w-0 items-center gap-2 rounded-xl text-left focus:outline-none focus:ring-2 focus:ring-indigo-400/50 sm:gap-3"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white shadow-inner shadow-white/20">
+                  {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                </span>
+                <span className="min-w-0 pr-1">
+                  <span className="block text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500">Akun</span>
+                  <span className="block max-w-28 truncate text-sm font-semibold text-slate-100 sm:max-w-40">
+                    {user?.name || user?.email || 'Pengguna'}
+                  </span>
+                </span>
+                <span aria-hidden="true" className="text-xs text-slate-400">{isUserMenuOpen ? '▲' : '▼'}</span>
+              </button>
+              {isUserMenuOpen && (
+                <div role="menu" className="absolute right-0 top-full z-50 mt-3 w-72 max-w-[calc(100vw-2rem)] rounded-2xl border border-white/10 bg-slate-900 p-4 shadow-2xl shadow-black/40">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-300">Detail pengguna</p>
+                  <dl className="mt-3 space-y-3">
+                    <div>
+                      <dt className="text-xs text-slate-500">Nama</dt>
+                      <dd className="mt-0.5 break-words text-sm font-medium text-slate-100">{user?.name || 'Belum tersedia'}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs text-slate-500">Email</dt>
+                      <dd className="mt-0.5 break-all text-sm font-medium text-slate-100">{user?.email || 'Belum tersedia'}</dd>
+                    </div>
+                  </dl>
+                </div>
+              )}
               <span aria-hidden="true" className="h-7 w-px bg-white/10" />
               <button
                 type="button"
@@ -69,12 +110,12 @@ const Dashboard = () => {
 
       {/* DASHBOARD CONTENT AREA */}
       <main className="relative z-10 mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <section className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/[0.10] via-white/[0.035] to-violet-500/[0.06] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-8">
+        <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/[0.10] via-white/[0.035] to-violet-500/[0.06] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">Ruang kerjamu</p>
               <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                Hai, {user?.name || 'Pengguna'} <span aria-hidden="true">👋</span>
+                Hai, {user?.name || user?.email || 'Pengguna'} <span aria-hidden="true">👋</span>
               </h1>
               <p className="mt-2 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
                 Susun prioritas dan selesaikan pekerjaanmu satu per satu.

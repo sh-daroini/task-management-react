@@ -40,7 +40,13 @@ export const ServicesProvider = ({ children }) => {
 
   function handleFormLogin(e) {
     e.preventDefault();
-    login({ token: "dummy_token", name: "Syaihan" });
+    const email = new FormData(e.currentTarget).get('email').trim();
+    const emailName = email.split('@')[0]
+      .split(/[._-]+/)
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' ');
+    login({ token: "dummy_token", email, name: emailName || email });
     navigate("/dashboard");
   }
 
